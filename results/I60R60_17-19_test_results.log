@@ -1,0 +1,9 @@
+Testing: 20191231 - 20170401
+Traceback (most recent call last):
+  File "/root/pythonprojects/new_CNN/CNN-for-Trading/test.py", line 115, in <module>
+    model_test(model, setting.TRAIN.LABEL, ['down', 'up'], criterion, setting)
+  File "/root/pythonprojects/new_CNN/CNN-for-Trading/test.py", line 25, in model_test
+    test_dataset = _D.ImageDataSet(win_size = setting.DATASET.LOOKBACK_WIN, \
+  File "/root/pythonprojects/new_CNN/CNN-for-Trading/dataset.py", line 108, in __init__
+    assert start_date < end_date, f'start date {start_date} cannnot be later than end date {end_date}'
+AssertionError: start date 20191231 cannnot be later than end date 20170401

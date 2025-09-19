@@ -1,0 +1,42 @@
+Testing: 20151231 - 20190401
+[Load Data] | 2025-09-18 14:26:32 Done | Using  0.146 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (64, 60)
+ 	 - Time Period:  20151231 - 20190401
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 1091.22it/s]
+Testing: 20190401 - 20190701
+[Load Data] | 2025-09-18 14:26:42 Done | Using  0.130 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (64, 60)
+ 	 - Time Period:  20190401 - 20190701
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 2926.26it/s]
+Testing: 20190701 - 20191001
+[Load Data] | 2025-09-18 14:26:46 Done | Using  0.130 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (64, 60)
+ 	 - Time Period:  20190701 - 20191001
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 2989.53it/s]
+Testing: 20191001 - 20191231
+[Load Data] | 2025-09-18 14:26:49 Done | Using  0.139 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (64, 60)
+ 	 - Time Period:  20191001 - 20191231
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 2939.25it/s]
+Test Loss: 0.814077
+
+Test Accuracy of  down: 38% (439/1147)
+Test Accuracy of    up: 72% (1363/1880)
+
+Test Accuracy (Overall): 59% (1802/3027)

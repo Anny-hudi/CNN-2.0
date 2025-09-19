@@ -1,0 +1,42 @@
+Testing: 20151231 - 20160401
+[Load Data] | 2025-09-18 14:25:33 Done | Using  0.140 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (64, 60)
+ 	 - Time Period:  20151231 - 20160401
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 1102.02it/s]
+Testing: 20160401 - 20160701
+[Load Data] | 2025-09-18 14:25:37 Done | Using  0.140 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (64, 60)
+ 	 - Time Period:  20160401 - 20160701
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 2791.24it/s]
+Testing: 20160701 - 20161001
+[Load Data] | 2025-09-18 14:25:40 Done | Using  0.137 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (64, 60)
+ 	 - Time Period:  20160701 - 20161001
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 2979.61it/s]
+Testing: 20161001 - 20161231
+[Load Data] | 2025-09-18 14:25:44 Done | Using  0.136 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (64, 60)
+ 	 - Time Period:  20161001 - 20161231
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 3093.91it/s]
+Test Loss: 0.751118
+
+Test Accuracy of  down: 36% (113/307)
+Test Accuracy of    up: 64% (297/458)
+
+Test Accuracy (Overall): 53% (410/765)

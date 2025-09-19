@@ -58,7 +58,7 @@ if __name__ == '__main__':
         setting = _U.Dict2ObjParser(yaml.safe_load(f)).parse()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    assert setting.MODEL in ['CNN5d', 'CNN20d'], f"Wrong Model Template: {setting.MODEL}"
+    assert setting.MODEL in ['CNN5d', 'CNN20d', 'CNN60d'], f"Wrong Model Template: {setting.MODEL}"
 
     if 'factors' not in os.listdir('./'):
         os.system('mkdir factors')
@@ -67,8 +67,10 @@ if __name__ == '__main__':
         
     if setting.MODEL == 'CNN5d':
         model = _M.CNN5d()
-    else:
+    elif setting.MODEL == 'CNN20d':
         model = _M.CNN20d()
+    else:
+        model = _M.CNN60d()
     model.to(device)
 
     state_dict = torch.load(setting.TRAIN.MODEL_SAVE_FILE)

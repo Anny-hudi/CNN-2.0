@@ -1,0 +1,90 @@
+开始测试I5R5_OHLCV模型...
+测试: configs/I5R5/I5R5_09-11.yml
+测试: configs/I5R5/I5R5_10-12.yml
+测试: configs/I5R5/I5R5_11-13.yml
+测试: configs/I5R5/I5R5_12-14.yml
+测试: configs/I5R5/I5R5_13-15.yml
+测试: configs/I5R5/I5R5_14-16.yml
+测试: configs/I5R5/I5R5_15-17.yml
+测试: configs/I5R5/I5R5_16-18.yml
+测试: configs/I5R5/I5R5_17-19.yml
+测试: configs/I5R5/I5R5_18-20.yml
+开始测试I5R20_OHLCV模型...
+测试: configs/I5R20/I5R20_09-11.yml
+测试: configs/I5R20/I5R20_10-12.yml
+测试: configs/I5R20/I5R20_11-13.yml
+测试: configs/I5R20/I5R20_12-14.yml
+测试: configs/I5R20/I5R20_13-15.yml
+测试: configs/I5R20/I5R20_14-16.yml
+测试: configs/I5R20/I5R20_15-17.yml
+测试: configs/I5R20/I5R20_16-18.yml
+测试: configs/I5R20/I5R20_17-19.yml
+测试: configs/I5R20/I5R20_18-20.yml
+开始测试I5R20_OHLCV模型...
+测试: configs/I5R20/I5R20_09-11.yml
+测试: configs/I5R20/I5R20_10-12.yml
+测试: configs/I5R20/I5R20_11-13.yml
+测试: configs/I5R20/I5R20_12-14.yml
+测试: configs/I5R20/I5R20_13-15.yml
+测试: configs/I5R20/I5R20_14-16.yml
+测试: configs/I5R20/I5R20_15-17.yml
+测试: configs/I5R20/I5R20_16-18.yml
+测试: configs/I5R20/I5R20_17-19.yml
+测试: configs/I5R20/I5R20_18-20.yml
+开始测试I20R5_OHLCV模型...
+测试: configs/I20R5/I20R5_09-11.yml
+测试: configs/I20R5/I20R5_10-12.yml
+测试: configs/I20R5/I20R5_11-13.yml
+测试: configs/I20R5/I20R5_12-14.yml
+测试: configs/I20R5/I20R5_13-15.yml
+测试: configs/I20R5/I20R5_14-16.yml
+测试: configs/I20R5/I20R5_15-17.yml
+测试: configs/I20R5/I20R5_16-18.yml
+测试: configs/I20R5/I20R5_17-19.yml
+测试: configs/I20R5/I20R5_18-20.yml
+开始测试I20R20_OHLCV模型...
+测试: configs/I20R20/I20R20_09-11.yml
+测试: configs/I20R20/I20R20_10-12.yml
+测试: configs/I20R20/I20R20_11-13.yml
+测试: configs/I20R20/I20R20_12-14.yml
+测试: configs/I20R20/I20R20_13-15.yml
+测试: configs/I20R20/I20R20_14-16.yml
+测试: configs/I20R20/I20R20_15-17.yml
+测试: configs/I20R20/I20R20_16-18.yml
+测试: configs/I20R20/I20R20_17-19.yml
+测试: configs/I20R20/I20R20_18-20.yml
+开始测试I60R5_OHLCV模型...
+测试: configs/I60R5/I60R5_09-11.yml
+测试: configs/I60R5/I60R5_10-12.yml
+测试: configs/I60R5/I60R5_11-13.yml
+测试: configs/I60R5/I60R5_12-14.yml
+测试: configs/I60R5/I60R5_13-15.yml
+测试: configs/I60R5/I60R5_14-16.yml
+测试: configs/I60R5/I60R5_15-17.yml
+测试: configs/I60R5/I60R5_16-18.yml
+测试: configs/I60R5/I60R5_17-19.yml
+测试: configs/I60R5/I60R5_18-20.yml
+开始测试I60R20_OHLCV模型...
+开始测试I60R20_OHLCV模型...
+测试: configs/I60R20/I60R20_09-11.yml
+测试: configs/I60R20/I60R20_10-12.yml
+开始测试I60R60_OHLCV模型...
+测试: configs/I60R60/I60R60_09-11.yml
+测试: configs/I60R20/I60R20_11-13.yml
+测试: configs/I60R60/I60R60_10-12.yml
+测试: configs/I60R20/I60R20_12-14.yml
+测试: configs/I60R60/I60R60_11-13.yml
+测试: configs/I60R20/I60R20_13-15.yml
+测试: configs/I60R60/I60R60_12-14.yml
+测试: configs/I60R20/I60R20_14-16.yml
+测试: configs/I60R60/I60R60_13-15.yml
+测试: configs/I60R20/I60R20_15-17.yml
+测试: configs/I60R60/I60R60_14-16.yml
+测试: configs/I60R20/I60R20_16-18.yml
+测试: configs/I60R60/I60R60_15-17.yml
+测试: configs/I60R60/I60R60_16-18.yml
+测试: configs/I60R20/I60R20_17-19.yml
+测试: configs/I60R20/I60R20_18-20.yml
+测试: configs/I60R60/I60R60_17-19.yml
+测试: configs/I60R60/I60R60_18-20.yml
+所有模型测试完成！

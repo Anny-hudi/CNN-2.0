@@ -34,12 +34,14 @@ def model_test(model, label_type, classes, criterion, setting):
         test_loader = torch.utils.data.DataLoader(dataset=test_imageset, batch_size=setting.TRAIN.BATCH_SIZE, shuffle=False)
         test_num += len(test_loader.dataset)
             
-        for i, (data, ret5, ret20) in enumerate(test_loader):
-            assert label_type in ['RET5', 'RET20'], f"Wrong Label Type: {label_type}"
+        for i, (data, ret5, ret20, ret60) in enumerate(test_loader):
+            assert label_type in ['RET5', 'RET20', 'RET60'], f"Wrong Label Type: {label_type}"
             if label_type == 'RET5':
                 target = ret5
-            else:
+            elif label_type == 'RET20':
                 target = ret20
+            else:  # RET60
+                target = ret60
                 
             target = (1-target).unsqueeze(1) @ torch.LongTensor([1., 0.]).unsqueeze(1).T + target.unsqueeze(1) @ torch.LongTensor([0, 1]).unsqueeze(1).T
             target = target.to(torch.float32)
@@ -64,8 +66,11 @@ def model_test(model, label_type, classes, criterion, setting):
                 class_total[label] += 1
 
     # average test loss
-    test_loss = test_loss/test_num
-    print('Test Loss: {:.6f}\n'.format(test_loss))
+    if test_num > 0:
+        test_loss = test_loss/test_num
+        print('Test Loss: {:.6f}\n'.format(test_loss))
+    else:
+        print('Test Loss: N/A (no test data)\n')
 
     for i in range(2):
         if class_total[i] > 0:
@@ -91,13 +96,15 @@ if __name__ == '__main__':
         setting = _U.Dict2ObjParser(yaml.safe_load(f)).parse()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    assert setting.MODEL in ['CNN5d', 'CNN20d'], f"Wrong Model Template: {setting.MODEL}"
+    assert setting.MODEL in ['CNN5d', 'CNN20d', 'CNN60d'], f"Wrong Model Template: {setting.MODEL}"
     
     
     if setting.MODEL == 'CNN5d':
         model = _M.CNN5d()
-    else:
+    elif setting.MODEL == 'CNN20d':
         model = _M.CNN20d()
+    else:
+        model = _M.CNN60d()
     model.to(device)
 
     state_dict = torch.load(setting.TRAIN.MODEL_SAVE_FILE)

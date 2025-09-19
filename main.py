@@ -53,18 +53,20 @@ valid_loader = torch.utils.data.DataLoader(dataset=valid_loader, batch_size=sett
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-assert setting.MODEL in ['CNN5d', 'CNN20d'], f"Wrong Model Template: {setting.MODEL}"
+assert setting.MODEL in ['CNN5d', 'CNN20d', 'CNN60d'], f"Wrong Model Template: {setting.MODEL}"
 
 
 if __name__ == '__main__':
     
     if setting.MODEL == 'CNN5d':
         model = _M.CNN5d()
-    else:
+    elif setting.MODEL == 'CNN20d':
         model = _M.CNN20d()
+    else:
+        model = _M.CNN60d()
     model.to(device)
 
-    criterion = nn.BCELoss().to(device)
+    criterion = nn.BCELoss().to(device)˜
     optimizer = optim.Adam(model.parameters(), lr=setting.TRAIN.LEARNING_RATE, weight_decay=setting.TRAIN.WEIGHT_DECAY)
     
     train_loss_set, valid_loss_set, train_acc_set, valid_acc_set = _T.train_n_epochs(setting.TRAIN.NEPOCH, model, setting.TRAIN.LABEL, train_loader, valid_loader, criterion, optimizer, setting.TRAIN.MODEL_SAVE_FILE, setting.TRAIN.EARLY_STOP_EPOCH)

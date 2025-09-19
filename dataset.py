@@ -1,7 +1,8 @@
 from __init__ import *
 import utils as _U
 reload(_U)
-
+from data_processing.processor import StockDataProcessor
+from data_processing.image_generator import OHLCImageGenerator
 
 SUPPORTED_INDICATORS = ['MA']
 
@@ -90,8 +91,9 @@ def single_symbol_image(tabular_df, image_size, start_date, sample_rate, indicat
     
         label_ret5 = 1 if np.sign(tabular_df.iloc[d]['ret5']) > 0 else 0
         label_ret20 = 1 if np.sign(tabular_df.iloc[d]['ret20']) > 0 else 0
+        label_ret60 = 1 if np.sign(tabular_df.iloc[d]['ret60']) > 0 else 0
         
-        entry = [image, label_ret5, label_ret20]
+        entry = [image, label_ret5, label_ret20, label_ret60]
         dataset.append(entry)
     
     if mode == 'train' or mode == 'test':
@@ -105,9 +107,9 @@ class ImageDataSet():
         ## Check whether inputs are valid
         assert isinstance(start_date, int) and isinstance(end_date, int), f'Type Error: start_date & end_date shoule be int'
         assert start_date < end_date, f'start date {start_date} cannnot be later than end date {end_date}'
-        assert win_size in [5, 20], f'Wrong look back days: {win_size}'
+        assert win_size in [5, 20, 60], f'Wrong look back days: {win_size}'
         assert mode in ['train', 'test', 'inference'], f'Type Error: {mode}'
-        assert label in ['RET5', 'RET20'], f'Wrong Label: {label}'
+        assert label in ['RET5', 'RET20', 'RET60'], f'Wrong Label: {label}'
         assert indicators is None or len(indicators)%2 == 0, 'Config Error, length of indicators should be even'
         if indicators:
             for i in range(len(indicators)//2):
@@ -117,8 +119,11 @@ class ImageDataSet():
         if win_size == 5:
             self.image_size = (32, 15)
             self.extra_dates = datetime.timedelta(days=40)
-        else:
+        elif win_size == 20:
             self.image_size = (64, 60)
+            self.extra_dates = datetime.timedelta(days=40)
+        elif win_size == 60:
+            self.image_size = (96, 180)
             self.extra_dates = datetime.timedelta(days=40)
             
         self.start_date = start_date
@@ -128,6 +133,11 @@ class ImageDataSet():
         self.indicators = indicators
         self.show_volume = show_volume
         self.parallel_num = parallel_num
+        self.win_size = win_size
+        
+        # 初始化数据处理器和图像生成器
+        self.data_processor = StockDataProcessor()
+        self.image_generator = OHLCImageGenerator(win_size)
         
         ## Load data from zipfile
         self.load_data()
@@ -142,76 +152,194 @@ class ImageDataSet():
         
     @_U.timer('Load Data', '8')
     def load_data(self):
-        if 'data' not in os.listdir():
-            print('Download Original Tabular Data')
-            os.system("mkdir data && cd data && wget 'https://cloud.tsinghua.edu.cn/f/f0bc022b5a084626855f/?dl=1' -O tabularDf.zip")
+        # 使用新的数据处理器加载数据
+        self.data_processor.load_data()
+        
+        # 为了保持兼容性，仍然创建self.df
+        # 但这里我们使用新的数据结构
+        all_data = []
+        for code, df in self.data_processor.data.items():
+            # 转换日期格式以保持兼容性
+            df_copy = df.copy()
+            df_copy['date'] = pd.to_datetime(df_copy['date']).dt.strftime('%Y%m%d').astype(int)
+            df_copy['code'] = code
+            all_data.append(df_copy)
+        
+        if all_data:
+            self.df = pd.concat(all_data, axis=0, ignore_index=True)
             
-        if 'data' in os.listdir() and 'tabularDf.zip' not in os.listdir('data'):
-            print('Download Original Tabular Data')
-            os.system("cd data && wget 'https://cloud.tsinghua.edu.cn/f/f0bc022b5a084626855f/?dl=1' -O tabularDf.zip")
-        
-        with ZipFile('data/tabularDf.zip', 'r') as z:
-            f =  z.open('tabularDf.csv')
-            tabularDf = pd.read_csv(f, index_col=0)
-            f.close()
-            z.close()
-            
-        # add extra rows to make sure image of start date and returns of end date can be calculated
-        padding_start_date = int(str(pd.to_datetime(str(self.start_date)) - self.extra_dates).split(' ')[0].replace('-', ''))
-        paddint_end_date = int(str(pd.to_datetime(str(self.end_date)) + self.extra_dates).split(' ')[0].replace('-', ''))
-        self.df = tabularDf.loc[(tabularDf['date'] > padding_start_date) & (tabularDf['date'] < paddint_end_date)].copy(deep=False)
-        tabularDf = [] # clear memory
-        
-        self.df['ret5'] = np.zeros(self.df.shape[0])
-        self.df['ret20'] = np.zeros(self.df.shape[0])
-        self.df['ret5'] = (self.df['close'].pct_change(5)*100).shift(-5)
-        self.df['ret20'] = (self.df['close'].pct_change(20)*100).shift(-20)
-        
-        self.df = self.df.loc[self.df['date'] <= self.end_date]
+            # 计算收益率（保持原有逻辑）
+            self.df['ret5'] = np.zeros(self.df.shape[0])
+            self.df['ret20'] = np.zeros(self.df.shape[0])
+            self.df['ret60'] = np.zeros(self.df.shape[0])
+            self.df = self.df.sort_values(['code', 'date']).reset_index(drop=True)
+            self.df['ret5'] = self.df.groupby('code')['close'].pct_change(5) * 100
+            self.df['ret20'] = self.df.groupby('code')['close'].pct_change(20) * 100
+            self.df['ret60'] = self.df.groupby('code')['close'].pct_change(60) * 100
+            self.df['ret5'] = self.df.groupby('code')['ret5'].shift(-5)
+            self.df['ret20'] = self.df.groupby('code')['ret20'].shift(-20)
+            self.df['ret60'] = self.df.groupby('code')['ret60'].shift(-60)
+
+            # 过滤日期范围
+            self.df = self.df.loc[self.df['date'] <= self.end_date]
+        else:
+            raise ValueError("未能加载任何数据")
         
         
     def generate_images(self, sample_rate):
-        dataset_all = Parallel(n_jobs=self.parallel_num)(delayed(single_symbol_image)(\
-                                        g[1], image_size = self.image_size,\
-                                           start_date = self.start_date,\
-                                          sample_rate = sample_rate,\
-                                           indicators = self.indicators,\
-                                          show_volume = self.show_volume, \
-                                            mode = self.mode
-                                        ) for g in tqdm(self.df.groupby('code'), desc=f'Generating Images (sample rate: {sample_rate})'))
+        """使用新的图像生成逻辑生成图像"""
+        # 获取所有股票代码
+        symbols = list(self.data_processor.data.keys())
         
-        if self.mode == 'train' or self.mode == 'test':
-            image_set = []
-            for symbol_data in dataset_all:
-                image_set = image_set + symbol_data
-            dataset_all = [] # clear memory
+        all_sequences = []
+        all_labels = []
+        all_dates = []
+        
+        # 为每个股票生成序列数据
+        for symbol in symbols:
+            try:
+                sequences, labels, dates = self.data_processor.get_processed_data(
+                    symbol, self.win_size, self.win_size
+                )
+                all_sequences.extend(sequences)
+                all_labels.extend(labels)
+                all_dates.extend(dates)
+            except Exception as e:
+                print(f"处理股票 {symbol} 时出错: {e}")
+                continue
+        
+        if len(all_sequences) == 0:
+            print("警告：没有生成任何序列数据")
+            return []
+        
+        # 根据标签类型选择对应的标签
+        if self.label == 'RET5':
+            # 对于RET5，我们需要重新计算5天收益率
+            target_labels = []
+            for i, seq in enumerate(all_sequences):
+                if i + 5 < len(all_sequences):
+                    current_price = seq['Adj_Close_calc'].iloc[-1]
+                    future_price = all_sequences[i + 5]['Adj_Close_calc'].iloc[-1]
+                    future_return = (future_price - current_price) / current_price
+                    target_labels.append(int(1 if future_return > 0 else 0))
+                else:
+                    target_labels.append(0)  # 默认标签
+        elif self.label == 'RET20':
+            # 对于RET20，我们需要重新计算20天收益率
+            target_labels = []
+            for i, seq in enumerate(all_sequences):
+                if i + 20 < len(all_sequences):
+                    current_price = seq['Adj_Close_calc'].iloc[-1]
+                    future_price = all_sequences[i + 20]['Adj_Close_calc'].iloc[-1]
+                    future_return = (future_price - current_price) / current_price
+                    target_labels.append(int(1 if future_return > 0 else 0))
+                else:
+                    target_labels.append(0)  # 默认标签
+        elif self.label == 'RET60':
+            # 对于RET60，我们需要重新计算60天收益率
+            target_labels = []
+            for i, seq in enumerate(all_sequences):
+                if i + 60 < len(all_sequences):
+                    current_price = seq['Adj_Close_calc'].iloc[-1]
+                    future_price = all_sequences[i + 60]['Adj_Close_calc'].iloc[-1]
+                    future_return = (future_price - current_price) / current_price
+                    target_labels.append(int(1 if future_return > 0 else 0))
+                else:
+                    target_labels.append(0)  # 默认标签
+        else:
+            target_labels = all_labels
+        
+        # 应用采样率
+        if sample_rate < 1.0:
+            import random
+            random.seed(42)  # 固定随机种子以确保可重复性
+            sampled_indices = random.sample(range(len(all_sequences)), 
+                                          int(len(all_sequences) * sample_rate))
+            all_sequences = [all_sequences[i] for i in sampled_indices]
+            target_labels = [target_labels[i] for i in sampled_indices]
+            all_dates = [all_dates[i] for i in sampled_indices]
+        
+        # 先计算训练集统计量（如果还没有计算的话）
+        if self.image_generator.train_mean is None or self.image_generator.train_std is None:
+            print("计算训练集统计量...")
+            # 使用前70%的数据作为训练集来计算统计量
+            train_size = int(len(all_sequences) * 0.7)
+            if train_size > 0:
+                train_sequences = all_sequences[:train_size]
+                self.image_generator.fit_normalizer(train_sequences)
+            else:
+                print("警告：训练集太小，跳过统计量计算")
+        
+        # 使用新的图像生成器生成图像
+        images = self.image_generator.generate_batch(all_sequences)
+        
+        # 构建数据集
+        dataset = []
+        for i in range(len(images)):
+            # 为了保持兼容性，我们仍然返回[image, ret5, ret20, ret60]格式
+            # 但这里我们使用计算出的目标标签
+            if self.label == 'RET5':
+                ret5 = target_labels[i]
+                ret20 = 0  # 占位符
+                ret60 = 0  # 占位符
+            elif self.label == 'RET20':
+                ret5 = 0   # 占位符
+                ret20 = target_labels[i]
+                ret60 = 0  # 占位符
+            elif self.label == 'RET60':
+                ret5 = 0   # 占位符
+                ret20 = 0  # 占位符
+                ret60 = target_labels[i]
+            else:
+                ret5 = ret20 = ret60 = 0
             
-            if self.mode == 'train': # resample to handle imbalance
-                image_set = pd.DataFrame(image_set, columns=['img', 'ret5', 'ret20'])
-                image_set['index'] =  image_set.index
+            dataset.append([images[i], ret5, ret20, ret60])
+        
+        if self.mode == 'train' and len(dataset) > 0:
+            # 处理类别不平衡（保持原有逻辑）
+            image_set = pd.DataFrame(dataset, columns=['img', 'ret5', 'ret20', 'ret60'])
+            image_set['index'] = image_set.index
+            
+            try:
+                from imblearn.over_sampling import SMOTE
                 smote = SMOTE()
+                
                 if self.label == 'RET5':
                     num0_before = image_set.loc[image_set['ret5'] == 0].shape[0]
                     num1_before = image_set.loc[image_set['ret5'] == 1].shape[0]
-                    resample_index, _ = smote.fit_resample(image_set[['index', 'ret20']], image_set['ret5'])
-                    image_set = image_set[['img', 'ret5', 'ret20']].loc[resample_index['index']]
+                    if num0_before > 0 and num1_before > 0:
+                        resample_index, _ = smote.fit_resample(image_set[['index', 'ret20', 'ret60']], image_set['ret5'])
+                        image_set = image_set[['img', 'ret5', 'ret20', 'ret60']].loc[resample_index['index']]
                     num0 = image_set.loc[image_set['ret5'] == 0].shape[0]
                     num1 = image_set.loc[image_set['ret5'] == 1].shape[0]
                     image_set = image_set.values.tolist()
                     
-                else:
+                elif self.label == 'RET20':
                     num0_before = image_set.loc[image_set['ret20'] == 0].shape[0]
                     num1_before = image_set.loc[image_set['ret20'] == 1].shape[0]
-                    resample_index, _ = smote.fit_resample(image_set[['index', 'ret5']], image_set['ret20'])
-                    image_set = image_set[['img', 'ret5', 'ret20']].loc[resample_index['index']]
+                    if num0_before > 0 and num1_before > 0:
+                        resample_index, _ = smote.fit_resample(image_set[['index', 'ret5', 'ret60']], image_set['ret20'])
+                        image_set = image_set[['img', 'ret5', 'ret20', 'ret60']].loc[resample_index['index']]
                     num0 = image_set.loc[image_set['ret20'] == 0].shape[0]
                     num1 = image_set.loc[image_set['ret20'] == 1].shape[0]
                     image_set = image_set.values.tolist()
                     
+                else:  # RET60
+                    num0_before = image_set.loc[image_set['ret60'] == 0].shape[0]
+                    num1_before = image_set.loc[image_set['ret60'] == 1].shape[0]
+                    if num0_before > 0 and num1_before > 0:
+                        resample_index, _ = smote.fit_resample(image_set[['index', 'ret5', 'ret20']], image_set['ret60'])
+                        image_set = image_set[['img', 'ret5', 'ret20', 'ret60']].loc[resample_index['index']]
+                    num0 = image_set.loc[image_set['ret60'] == 0].shape[0]
+                    num1 = image_set.loc[image_set['ret60'] == 1].shape[0]
+                    image_set = image_set.values.tolist()
+                    
                 print(f"LABEL: {self.label}\n\tBefore Resample: 0: {num0_before}/{num0_before+num1_before}, 1: {num1_before}/{num0_before+num1_before}\n\tResampled ImageSet: 0: {num0}/{num0+num1}, 1: {num1}/{num0+num1}")
-                 
-            
-            return image_set
-    
+                
+            except ImportError:
+                print("警告：未安装imbalanced-learn，跳过SMOTE重采样")
+                image_set = image_set.values.tolist()
         else:
-            return dataset_all
+            image_set = dataset
+        
+        return image_set

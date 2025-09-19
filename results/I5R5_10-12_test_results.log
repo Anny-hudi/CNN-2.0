@@ -1,0 +1,42 @@
+Testing: 20121231 - 20130401
+[Load Data] | 2025-09-18 14:05:44 Done | Using  0.145 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (32, 15)
+ 	 - Time Period:  20121231 - 20130401
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 1190.77it/s]
+Testing: 20130401 - 20130701
+[Load Data] | 2025-09-18 14:05:48 Done | Using  0.138 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (32, 15)
+ 	 - Time Period:  20130401 - 20130701
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 2790.00it/s]
+Testing: 20130701 - 20131001
+[Load Data] | 2025-09-18 14:05:52 Done | Using  0.144 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (32, 15)
+ 	 - Time Period:  20130701 - 20131001
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 2805.55it/s]
+Testing: 20131001 - 20131231
+[Load Data] | 2025-09-18 14:05:55 Done | Using  0.141 seconds
+DataSet Initialized
+ 	 - Mode:         TEST
+ 	 - Image Size:   (32, 15)
+ 	 - Time Period:  20131001 - 20131231
+ 	 - Indicators:   []
+ 	 - Volume Shown: True
+Generating Images (sample rate: 1.0):   0%|          | 0/3 [00:00<?, ?it/s]Generating Images (sample rate: 1.0): 100%|██████████| 3/3 [00:00<00:00, 2897.95it/s]
+Test Loss: 0.792784
+
+Test Accuracy of  down: 46% (125/268)
+Test Accuracy of    up: 56% (283/500)
+
+Test Accuracy (Overall): 53% (408/768)
