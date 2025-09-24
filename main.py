@@ -7,6 +7,8 @@ import train as _T
 reload(_T)
 import dataset as _D
 reload(_D)
+import custom_dataset as _CD
+reload(_CD)
 import sys
 
 
@@ -44,12 +46,15 @@ dataset = _D.ImageDataSet(win_size = setting.DATASET.LOOKBACK_WIN, \
 
 image_set = dataset.generate_images(setting.DATASET.SAMPLE_RATE)
 
-train_loader_size = int(len(image_set)*(1-setting.TRAIN.VALID_RATIO))
-valid_loader_size = len(image_set) - train_loader_size
+# 使用自定义数据集类来正确处理图像和标签
+trading_dataset = _CD.TradingDataset(image_set, setting.TRAIN.LABEL)
 
-train_loader, valid_loader = torch.utils.data.random_split(image_set, [train_loader_size, valid_loader_size])
-train_loader = torch.utils.data.DataLoader(dataset=train_loader, batch_size=setting.TRAIN.BATCH_SIZE, shuffle=True)
-valid_loader = torch.utils.data.DataLoader(dataset=valid_loader, batch_size=setting.TRAIN.BATCH_SIZE, shuffle=True)
+train_loader_size = int(len(trading_dataset)*(1-setting.TRAIN.VALID_RATIO))
+valid_loader_size = len(trading_dataset) - train_loader_size
+
+train_dataset, valid_dataset = torch.utils.data.random_split(trading_dataset, [train_loader_size, valid_loader_size])
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=setting.TRAIN.BATCH_SIZE, shuffle=True)
+valid_loader = torch.utils.data.DataLoader(dataset=valid_dataset, batch_size=setting.TRAIN.BATCH_SIZE, shuffle=True)
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -66,7 +71,7 @@ if __name__ == '__main__':
         model = _M.CNN60d()
     model.to(device)
 
-    criterion = nn.BCELoss().to(device)˜
+    criterion = nn.CrossEntropyLoss().to(device)
     optimizer = optim.Adam(model.parameters(), lr=setting.TRAIN.LEARNING_RATE, weight_decay=setting.TRAIN.WEIGHT_DECAY)
     
     train_loss_set, valid_loss_set, train_acc_set, valid_acc_set = _T.train_n_epochs(setting.TRAIN.NEPOCH, model, setting.TRAIN.LABEL, train_loader, valid_loader, criterion, optimizer, setting.TRAIN.MODEL_SAVE_FILE, setting.TRAIN.EARLY_STOP_EPOCH)

@@ -7,6 +7,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dataset import ImageDataSet
 
+# 设置中文字体
+plt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans', 'Arial Unicode MS', 'WenQuanYi Micro Hei']
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+
 def test_5day_quick():
     """快速测试5天图像生成"""
     print("快速测试5天窗口图像生成...")

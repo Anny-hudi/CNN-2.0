@@ -19,18 +19,7 @@ def train_n_epochs(n_epochs, model, label_type, train_loader, valid_loader, crit
         
         #### Model for training 
         model.train()
-        for i, (data, ret5, ret20, ret60) in enumerate(train_loader):
-            assert label_type in ['RET5', 'RET20', 'RET60'], f"Wrong Label Type: {label_type}"
-            if label_type == 'RET5':
-                target = ret5
-            elif label_type == 'RET20':
-                target = ret20
-            else:  # RET60
-                target = ret60
-
-            target = (1-target).unsqueeze(1) @ torch.LongTensor([1., 0.]).unsqueeze(1).T + target.unsqueeze(1) @ torch.LongTensor([0, 1]).unsqueeze(1).T
-            target = target.to(torch.float32)
-
+        for i, (data, target) in enumerate(train_loader):
             data, target = data.to(device), target.to(device)
             # clear the gradients of all optimized variables
             optimizer.zero_grad()
@@ -45,23 +34,12 @@ def train_n_epochs(n_epochs, model, label_type, train_loader, valid_loader, crit
             # update training loss
             train_loss += loss.item()*data.size(0)
             # update training acc
-            train_acc += (output.argmax(1) == target.argmax(1)).sum()
+            train_acc += (output.argmax(1) == target).sum()
 
 
         #### Model for validation
         model.eval()
-        for i, (data, ret5, ret20, ret60) in enumerate(valid_loader):
-            assert label_type in ['RET5', 'RET20', 'RET60'], f"Wrong Label Type: {label_type}"
-            if label_type == 'RET5':
-                target = ret5
-            elif label_type == 'RET20':
-                target = ret20
-            else:  # RET60
-                target = ret60
-                
-            target = (1-target).unsqueeze(1) @ torch.LongTensor([1., 0.]).unsqueeze(1).T + target.unsqueeze(1) @ torch.LongTensor([0, 1]).unsqueeze(1).T
-            target = target.to(torch.float32)
-                
+        for i, (data, target) in enumerate(valid_loader):
             # move tensors to GPU if CUDA is available
             data, target = data.to(device), target.to(device)
             # forward pass: compute predicted outputs by passing inputs to the model
@@ -70,7 +48,7 @@ def train_n_epochs(n_epochs, model, label_type, train_loader, valid_loader, crit
             loss = criterion(output, target)
             # update average validation loss 
             valid_loss += loss.item()*data.size(0)
-            valid_acc += (output.argmax(1) == target.argmax(1)).sum()
+            valid_acc += (output.argmax(1) == target).sum()
         
         # Compute average loss
         train_loss = train_loss/len(train_loader.sampler)
