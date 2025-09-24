@@ -22,7 +22,7 @@ def test_5day_quick():
         dataset = ImageDataSet(
             win_size=5,
             start_date=19930101,
-            end_date=20191231,
+            end_date=20001231,
             mode='train',
             label='RET5',
             indicators=[],

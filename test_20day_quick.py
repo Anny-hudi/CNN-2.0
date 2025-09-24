@@ -22,7 +22,7 @@ def test_20day_quick():
         dataset = ImageDataSet(
             win_size=20,
             start_date=19930101,
-            end_date=20191231,
+            end_date=20001231,
             mode='train',
             label='RET20',
             indicators=[],

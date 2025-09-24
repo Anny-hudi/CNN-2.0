@@ -19,8 +19,8 @@ TRAIN:
   NEPOCH: 100
   LEARNING_RATE: 0.00001
   WEIGHT_DECAY: 0.01
-  MODEL_SAVE_FILE: models/test_small/test_small.tar
-  LOG_SAVE_FILE: logs/test_small/test_small.csv
+  MODEL_SAVE_FILE: models_2/test_small/test_small.tar
+  LOG_SAVE_FILE: logs_2/test_small/test_small.csv
   EARLY_STOP_EPOCH: 2
 
 TEST:

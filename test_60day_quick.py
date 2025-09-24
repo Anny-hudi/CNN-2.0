@@ -22,7 +22,7 @@ def test_60day_quick():
         dataset = ImageDataSet(
             win_size=60,
             start_date=19930101,
-            end_date=20191231,
+            end_date=20001231,
             mode='train',
             label='RET60',
             indicators=[],

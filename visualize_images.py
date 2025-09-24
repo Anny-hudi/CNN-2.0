@@ -142,7 +142,7 @@ def analyze_image_structure(image, setting):
 def main():
     """主函数"""
     # 默认配置文件路径
-    config_path = "configs/I5R5/I5R5_09-11.yml"
+    config_path = "configs/I5R5/I5R5_93-00_train.yml"
     
     if len(sys.argv) > 1:
         config_path = sys.argv[1]
