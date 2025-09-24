@@ -34,7 +34,8 @@ class OHLCImageGenerator:
         train_images = []
         for seq in train_sequences:
             img = self.generate_image(seq)
-            img = img.reshape(self.height, self.width, 1)
+            # 不要添加通道维度，保持2D图像
+            # img = img.reshape(self.height, self.width, 1)  # 删除这行
             train_images.append(img)
         
         train_images = np.array(train_images, dtype=np.float32)
@@ -177,8 +178,8 @@ class OHLCImageGenerator:
         images = []
         for seq in sequences:
             img = self.generate_image(seq)
-            # 添加通道维度
-            img = img.reshape(self.height, self.width, 1)
+            # 不要添加通道维度，让PyTorch自动处理
+            # img = img.reshape(self.height, self.width, 1)  # 删除这行
             
             # 如果已经计算了训练集统计量，进行标准化
             if self.train_mean is not None and self.train_std is not None:

@@ -103,15 +103,50 @@ class StockDataProcessor:
         df['has_volume'] = ~df['volume'].isna()
         df['has_high_low'] = ~(df['high'].isna() | df['low'].isna())
         
+        # 处理异常值：移除极端的价格变化
+        df['price_change'] = df['close'].pct_change()
+        df = df[abs(df['price_change']) < 0.5]  # 移除单日涨跌幅超过50%的异常值
+        
+        # 重新计算收益率
+        df['Return'] = df['close'].pct_change()
+        
         return df
     
     def adjust_prices(self, df):
-        """调整价格序列（简化版本，假设没有调整因子）"""
-        # 直接使用原始价格作为调整后价格
-        df['Adj_Open'] = df['open']
-        df['Adj_High'] = df['high']  
-        df['Adj_Low'] = df['low']
-        df['Adj_Close_calc'] = df['close']
+        """按照论文要求进行价格标准化处理"""
+        # 确保数据按日期排序
+        df = df.sort_values('date').reset_index(drop=True)
+        
+        # 计算日收益率
+        df['Return'] = df['close'].pct_change()
+        
+        # 按照论文要求：首日收盘价设为1，基于回报率计算后续价格
+        df['normalized_close'] = 1.0  # 首日收盘价设为1
+        
+        # 基于回报率计算后续每日收盘价: pt+1 = (1 + RETt+1) * pt
+        for i in range(1, len(df)):
+            if not pd.isna(df.loc[i, 'Return']):
+                df.loc[i, 'normalized_close'] = (1 + df.loc[i, 'Return']) * df.loc[i-1, 'normalized_close']
+            else:
+                df.loc[i, 'normalized_close'] = df.loc[i-1, 'normalized_close']
+        
+        # 按当天收盘价水平的比例来划分开盘价、最高价和最低价
+        # 计算原始价格相对于收盘价的比例
+        df['open_ratio'] = df['open'] / df['close']
+        df['high_ratio'] = df['high'] / df['close']
+        df['low_ratio'] = df['low'] / df['close']
+        
+        # 应用比例到标准化后的收盘价
+        df['Adj_Open'] = df['open_ratio'] * df['normalized_close']
+        df['Adj_High'] = df['high_ratio'] * df['normalized_close']
+        df['Adj_Low'] = df['low_ratio'] * df['normalized_close']
+        df['Adj_Close_calc'] = df['normalized_close']
+        
+        # 确保收盘价完全匹配标准化后的价格
+        df['Adj_Close_calc'] = df['normalized_close']
+        
+        # 清理临时列
+        df = df.drop(['open_ratio', 'high_ratio', 'low_ratio'], axis=1)
         
         return df
     
